@@ -1,3 +1,4 @@
+
 import React, { useCallback, useEffect, useState } from 'react';
 import LiveCursors from './cursor/LiveCursors';
 import { useBroadcastEvent, useEventListener, useMyPresence, useOthers } from '@liveblocks/react';
@@ -149,7 +150,7 @@ const Live = ({canvasRef}:Props) => {
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
     >
-      <canvas   ref={canvasRef} width={800} height={600}/>
+      <canvas   ref={canvasRef} className='h-full w-full'/>
       {reaction.map((r) => (
         <FlyingReaction
           key={r.timestamp.toString()}
