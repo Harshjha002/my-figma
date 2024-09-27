@@ -9,16 +9,17 @@ import {  useEffect, useRef, useState } from "react";
 import { handleCanvasMouseDown, handleCanvasMouseMove, handleCanvasMouseUp, handleCanvasObjectModified, handleResize, initializeFabric, renderCanvas } from '@/lib/canvas';
 import { ActiveElement } from '@/types/type';
 
-import { useMutation, useStorage } from "@liveblocks/react";
+import { useMutation, useRedo, useStorage, useUndo } from "@liveblocks/react";
 import { defaultNavElement } from "@/constants";
-import { handleDelete } from "@/lib/key-events";
+import { handleDelete, handleKeyDown } from "@/lib/key-events";
 
 
 
 
 
 export default function Home() {
-
+  const undo=useUndo()
+  const redo=useRedo()
   const canvasRef=useRef<HTMLCanvasElement>(null)
   const fabricRef=useRef<fabric.Canvas | null >(null)
   const isDrawing=useRef(false)
@@ -136,6 +137,17 @@ export default function Home() {
 
     window.addEventListener('resize' , () => {
       handleResize({fabricRef})
+    })
+
+    window.addEventListener("keydown" , (e) => {
+      handleKeyDown({
+        e,
+        canvas:fabricRef.current,
+        undo,
+        redo,
+        syncShapeInStorage,
+        deleteShapeFromStorage
+      })
     })
 
     return () =>{
