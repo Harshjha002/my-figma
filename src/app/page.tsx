@@ -6,8 +6,8 @@ import Live from "@/components/Live";
 import Navbar from "@/components/Navbar";
 import RightSidebar from "@/components/RightSidebar";
 import {  useEffect, useRef, useState } from "react";
-import { handleCanvasMouseDown, handleCanvasMouseMove, handleCanvasMouseUp, handleCanvasObjectModified, handleResize, initializeFabric, renderCanvas } from '@/lib/canvas';
-import { ActiveElement } from '@/types/type';
+import { handleCanvasMouseDown, handleCanvasMouseMove, handleCanvasMouseUp, handleCanvasObjectModified, handleCanvasObjectScaling, handleCanvasSelectionCreated, handleResize, initializeFabric, renderCanvas } from '@/lib/canvas';
+import { ActiveElement, Attributes } from '@/types/type';
 
 import { useMutation, useRedo, useStorage, useUndo } from "@liveblocks/react";
 import { defaultNavElement } from "@/constants";
@@ -24,6 +24,18 @@ export default function Home() {
   const selectedShapeRef=useRef<string | null>(null)
   const activeObjectRef = useRef<fabric.Object | null>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
+  const isEditingRef = useRef(false)
+
+  const [elementAttributes, setElementAttributes] = useState<Attributes>({
+    width:'',
+    height:'',
+    fontSize:'',
+    fontFamily:'',
+    fontWeight:'',
+    fill:'#aabbcc',
+    stroke:'#aabbcc'
+
+  })
 
   const canvasObjects = useStorage((root) => root.canvasObjects as Map<string, any>);
 
@@ -140,6 +152,22 @@ export default function Home() {
       })
     })
 
+    canvas.on("selection:created" ,(options:any) => {
+      handleCanvasSelectionCreated({
+        options,
+        isEditingRef,
+        setElementAttributes
+      })
+    })
+
+    canvas.on("object:scaling" ,(options) => {
+      handleCanvasObjectScaling({
+        options,
+        setElementAttributes
+      })
+    })
+
+
     window.addEventListener('resize' , () => {
       handleResize({fabricRef})
     })
@@ -190,7 +218,14 @@ export default function Home() {
           allShapes={canvasObjects && Array.from(canvasObjects)}
         />
         <Live canvasRef={canvasRef}/>
-        <RightSidebar/>
+        <RightSidebar
+        elementAttributes={elementAttributes}
+        setElementAttributes={setElementAttributes}
+        fabricRef={fabricRef}
+        isEditingRef={isEditingRef}
+        activeObjectRef={activeObjectRef}
+        syncShapeInStorage={syncShapeInStorage}
+        />
       </section>
 
     </main>

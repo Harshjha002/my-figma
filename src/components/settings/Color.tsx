@@ -1,6 +1,7 @@
 import { Label } from "../ui/label";
 
 type Props = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   inputRef: any;
   attribute: string;
   placeholder: string;
